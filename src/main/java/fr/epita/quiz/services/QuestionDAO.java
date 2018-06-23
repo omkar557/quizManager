@@ -1,11 +1,9 @@
 package fr.epita.quiz.services;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
 
 import fr.epita.quiz.datamodel.Question;
 
@@ -14,6 +12,10 @@ public class QuestionDAO extends GenericORMDao<Question>{
 	@Inject
 	@Named("questionQuery")
 	String query;
+	
+	@Inject
+	@Named("allQuestionQuery")
+	String getAllQuestionsQuery;
 //
 //	@Override
 //	protected WhereClauseBuilder<Question> getWhereClauseBuilder(Question entity) {
@@ -49,5 +51,11 @@ public class QuestionDAO extends GenericORMDao<Question>{
 	 * (non-Javadoc)
 	 * @see fr.epita.quiz.services.GenericHibernateDao#getWhereClauseBuilder(java.lang.Object)
 	 */
+	
+    public List<Question> getListOfAllQuestions(Question question){
+		
+		List<Question> studentList = this.getListOfRecord(question, getAllQuestionsQuery);
+		return studentList;
+	}
 
 }

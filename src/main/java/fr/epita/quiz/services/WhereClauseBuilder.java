@@ -2,7 +2,7 @@ package fr.epita.quiz.services;
 
 import java.util.Map;
 
-public class WhereClauseBuilder <T> {
+public class WhereClauseBuilder {
 
 	private Map<String, Object> parameters;
 	private String queryString;

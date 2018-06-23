@@ -8,49 +8,82 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.inject.Inject;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
-public class GenericORMDao<T> {
+@Repository
+/**
+ * 
+ * @author itsme_omkar
+ *
+ * @param <T> Generic Entity
+ */
+public abstract class GenericORMDao<T> {
 	
 	@Autowired
 	SessionFactory sf;
 	
+	private static final Logger LOGGER = LogManager.getLogger(GenericORMDao.class);
+	
+	/**
+	 * 
+	 * @param entity Credentials to create
+	 */
 	public final void create(T entity) {
 		if (!beforeCreate(entity)) {
 			return;
 		}
 
 		final Session session = sf.openSession();
+		Transaction tr = session.beginTransaction();
 		session.saveOrUpdate(entity);
+		tr.commit();
 	}
 
 	protected boolean beforeCreate(T entity) {
 		return entity != null;
 	}
-
+    
+	/**
+	 * 
+	 * @param entity Credentials to update
+	 */
 	public final void update(T entity) {
 		final Session session = sf.openSession();
+		Transaction tr = session.beginTransaction();
 		session.saveOrUpdate(entity);
+		tr.commit();
 	}
-
+    
+	/**
+	 * 
+	 * @param entity Credentials to delete
+	 */
 	public final void delete(T entity) {
 		final Session session = sf.openSession();
 		session.delete(entity);
 	}
-
+    
+	/**
+	 * 
+	 * @param entity 
+	 * @return List of the search query
+	 */
 	public final List<T> search(T entity) {
 		final Session session = sf.openSession();
-		final WhereClauseBuilder<T> wcb = new WhereClauseBuilder<T>();
+		final WhereClauseBuilder wcb = new WhereClauseBuilder();
 		wcb.setQueryString(generateHqlString(entity));
 		wcb.setParameters(linkedListBuilder(entity));
 		final Query searchQuery = session.createQuery(wcb.getQueryString());
+		
 		for (final Entry<String, Object> parameterEntry : wcb.getParameters().entrySet()) {
 			searchQuery.setParameter(parameterEntry.getKey(), parameterEntry.getValue());
 		}
@@ -70,8 +103,6 @@ public class GenericORMDao<T> {
 		final BeanWrapper sourceBean = new BeanWrapperImpl(entity.getClass());
 		final PropertyDescriptor[] propertyDescriptors = sourceBean.getPropertyDescriptors();
 
-		final Map<String, Object> parameters = new LinkedHashMap<>();
-
 		int i = 0;
 
 		String simpleName = entity.getClass().getSimpleName();
@@ -87,7 +118,7 @@ public class GenericORMDao<T> {
 	}
 
 	/**
-	 * The string creates the where clause for the generateHqlString
+	 * Dynamic where clause builder
 	 * 
 	 * @param simpleName The simple name
 	 * @param attributeName The attribute name
@@ -107,7 +138,13 @@ public class GenericORMDao<T> {
 		}
 		return str;
 	}
-
+    
+	/**
+	 * Link list builder 
+	 *   
+	 * @param entity Entities for the Linked list
+	 * @return parameters Parameters
+	 */
 	public Map linkedListBuilder(T entity) {
 
 		final BeanWrapper sourceBean = new BeanWrapperImpl(entity.getClass());
@@ -127,9 +164,42 @@ public class GenericORMDao<T> {
 				}
 
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
+				LOGGER.debug("Error while insertion");		
+				}
 		}
 		return parameters;
 	}
+	
+	
+	 /**
+	  * A generic method to query all records from a defined database on the bases of the
+	  * object that is passed to it as a parameter
+	  * @param entity object that is passed
+	  * @param queryString string to be passed and executed
+	  * @return
+	  */
+	public List<T> getListOfRecord(T entity, String queryString) {
+		
+		final Session sessions = sf.openSession();
+		Transaction transactions = null;
+		List<T> listOfRecord = null;
+		try {
+			
+			transactions = sessions.beginTransaction();
+			Query query = sessions.createQuery(queryString); 
+			listOfRecord = query.list();
+
+			transactions.commit();		
+		} catch (Exception e) {
+
+			if (sf.isOpen()) {
+				sf.close();
+			}
+			transactions.rollback();
+			
+			listOfRecord = null;
+		}
+				
+		return listOfRecord;
+	}	
 }

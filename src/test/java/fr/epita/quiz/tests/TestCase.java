@@ -17,6 +17,11 @@ import fr.epita.quiz.datamodel.Question;
 import fr.epita.quiz.datamodel.QuestionType;
 
 
+/**
+ * @author itsme_omkar
+ *
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/applicationContext.xml" })
 public class TestCase {

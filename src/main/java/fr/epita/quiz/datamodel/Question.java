@@ -7,12 +7,21 @@ import javax.persistence.Id;
 
 @Entity
 public class Question {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-	private String question;
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	private String questionObject;
+
 	private QuestionType type;
 
 	/**
@@ -21,11 +30,17 @@ public class Question {
 	public Question() {
 	}
 
+	public Question(int id, String questionObject, QuestionType type) {
+		this.id = id;
+		this.type = type;
+		this.questionObject = questionObject;
+	}
+
 	/**
 	 * @return the question
 	 */
 	public String getQuestion() {
-		return question;
+		return questionObject;
 	}
 
 	/**
@@ -33,7 +48,7 @@ public class Question {
 	 *            the question to set
 	 */
 	public void setQuestion(String question) {
-		this.question = question;
+		this.questionObject = question;
 	}
 
 	/**
@@ -51,20 +66,4 @@ public class Question {
 		this.type = type;
 	}
 
-	/**
-	 * @return the id
-	 */
-	public Integer getId() {
-		return id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
 }
-

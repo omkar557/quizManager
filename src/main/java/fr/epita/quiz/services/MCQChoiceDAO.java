@@ -1,13 +1,13 @@
-/**
- * Ce fichier est la propriété de Thomas BROUSSARD
- * Code application :
- * Composant :
- */
 package fr.epita.quiz.services;
 
 import java.util.LinkedHashMap;
 
+import javax.persistence.Query;
+
+import org.hibernate.Session;
+
 import fr.epita.quiz.datamodel.MCQChoice;
+import fr.epita.quiz.datamodel.Question;
 
 /**
  * <h3>Description</h3>
@@ -52,5 +52,19 @@ public class MCQChoiceDAO extends GenericORMDao<MCQChoice> {
 		return entity.getChoice() != null && entity.getQuestion() != null;
 
 	}
-
+	
+/**
+ * Delete the MCQs	
+ * 
+ * @param question Question instance
+ * @return Integer result of the update query
+ */
+public boolean deleteAllMCQs(Question question){
+	
+		final Session session = sf.openSession();
+		Query query = session.createQuery("delete from MCQChoice where question:question");
+		query.setParameter("question", question);
+		int result = query.executeUpdate();
+		return result>=1;
+	}
 }

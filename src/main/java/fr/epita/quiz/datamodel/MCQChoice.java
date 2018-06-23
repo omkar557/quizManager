@@ -8,6 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
+/**
+ * Class for MCQ Choices
+ * @author itsme_omkar
+ *
+ */
 public class MCQChoice {
 
 	@Id

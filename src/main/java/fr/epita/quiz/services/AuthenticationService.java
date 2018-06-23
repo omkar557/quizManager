@@ -1,8 +1,3 @@
-/**
- * Ce fichier est la propriété de Thomas BROUSSARD
- * Code application :
- * Composant :
- */
 package fr.epita.quiz.services;
 
 import javax.inject.Inject;
@@ -12,13 +7,13 @@ public class AuthenticationService {
 
 	@Inject
 	private LoginDAO loginDAO;
-
-	public AuthenticationService() {
-		loginDAO= new LoginDAO();
-	}
-
+    /**
+     * 
+     * @param entity
+     * @return
+     */
 	public boolean authenticate(Login entity) {
-		return (loginDAO.search(entity).size()>=1);
+		return (!loginDAO.search(entity).isEmpty());
 	}
 
 }
